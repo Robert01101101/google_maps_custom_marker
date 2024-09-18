@@ -8,19 +8,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 void main() {
   group('Test createCustomIconForMarker()', () {
-    test('calls createCustomIconForMarker() for a bubble shape with only required parameters', () async {
-      Marker testMarker = await GoogleMapsCustomMarker.createCustomMarker(
-        marker: const Marker(
-            markerId: MarkerId('bubble'),
-            position: LatLng(49.281986774819636, -123.1254609406434),
-        ),
-        shape: MarkerShape.bubble,
-        title: 'Hello World!',
-      );
-      expect(testMarker, isNotNull);
-    });
-
-    test('calls createCustomIconForMarker() for a bubble shape with all available parameters', () async {
+    test(
+        'calls createCustomIconForMarker() for a bubble shape with only required parameters',
+        () async {
       Marker testMarker = await GoogleMapsCustomMarker.createCustomMarker(
         marker: const Marker(
           markerId: MarkerId('bubble'),
@@ -28,7 +18,22 @@ void main() {
         ),
         shape: MarkerShape.bubble,
         title: 'Hello World!',
-        backgroundColor: GoogleMapsCustomMarkerColor.markerYellow.withOpacity(.8),
+      );
+      expect(testMarker, isNotNull);
+    });
+
+    test(
+        'calls createCustomIconForMarker() for a bubble shape with all available parameters',
+        () async {
+      Marker testMarker = await GoogleMapsCustomMarker.createCustomMarker(
+        marker: const Marker(
+          markerId: MarkerId('bubble'),
+          position: LatLng(49.281986774819636, -123.1254609406434),
+        ),
+        shape: MarkerShape.bubble,
+        title: 'Hello World!',
+        backgroundColor:
+            GoogleMapsCustomMarkerColor.markerYellow.withOpacity(.8),
         foregroundColor: Colors.black,
         textSize: 38,
         enableShadow: false,
@@ -43,7 +48,9 @@ void main() {
       expect(testMarker, isNotNull);
     });
 
-    test('calls createCustomIconForMarker() for a pin shape with only required parameters', () async {
+    test(
+        'calls createCustomIconForMarker() for a pin shape with only required parameters',
+        () async {
       Marker testMarker = await GoogleMapsCustomMarker.createCustomMarker(
         marker: const Marker(
           markerId: MarkerId('pin'),
@@ -54,7 +61,9 @@ void main() {
       expect(testMarker, isNotNull);
     });
 
-    test('calls createCustomIconForMarker() for a pin shape with all available parameters', () async {
+    test(
+        'calls createCustomIconForMarker() for a pin shape with all available parameters',
+        () async {
       Marker testMarker = await GoogleMapsCustomMarker.createCustomMarker(
         marker: const Marker(
           markerId: MarkerId('pin'),
@@ -62,7 +71,8 @@ void main() {
         ),
         shape: MarkerShape.pin,
         title: '99',
-        backgroundColor: GoogleMapsCustomMarkerColor.markerYellow.withOpacity(.8),
+        backgroundColor:
+            GoogleMapsCustomMarkerColor.markerYellow.withOpacity(.8),
         foregroundColor: Colors.black,
         textSize: 38,
         enableShadow: false,
@@ -77,7 +87,9 @@ void main() {
       expect(testMarker, isNotNull);
     });
 
-    test('calls createCustomIconForMarker() for a circle shape with only required parameters', () async {
+    test(
+        'calls createCustomIconForMarker() for a circle shape with only required parameters',
+        () async {
       Marker testMarker = await GoogleMapsCustomMarker.createCustomMarker(
         marker: const Marker(
           markerId: MarkerId('circle'),
@@ -88,7 +100,9 @@ void main() {
       expect(testMarker, isNotNull);
     });
 
-    test('calls createCustomIconForMarker() for a circle shape with all available parameters', () async {
+    test(
+        'calls createCustomIconForMarker() for a circle shape with all available parameters',
+        () async {
       Marker testMarker = await GoogleMapsCustomMarker.createCustomMarker(
         marker: const Marker(
           markerId: MarkerId('circle'),
@@ -96,7 +110,8 @@ void main() {
         ),
         shape: MarkerShape.circle,
         title: '99',
-        backgroundColor: GoogleMapsCustomMarkerColor.markerYellow.withOpacity(.8),
+        backgroundColor:
+            GoogleMapsCustomMarkerColor.markerYellow.withOpacity(.8),
         foregroundColor: Colors.black,
         textSize: 38,
         enableShadow: false,

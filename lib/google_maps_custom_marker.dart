@@ -10,6 +10,7 @@ enum MarkerShape { circle, pin, bubble }
 
 class CircleMarkerOptions {
   final double? diameter;
+
   /// Configures additional options for a circle marker.
   /// The [diameter] parameter specifies the diameter of the circle.
   /// Setting the diameter will require you to ensure an appropriate text size to fit the optional title.
@@ -74,11 +75,10 @@ class GoogleMapsCustomMarkerColor {
 
 /// A utility class to create custom markers for Google Maps.
 class GoogleMapsCustomMarker {
-  static TextStyle _createTextStyle({
-    required double textSize,
-    required Color textColor,
-    TextStyle? textStyle})
-  {
+  static TextStyle _createTextStyle(
+      {required double textSize,
+      required Color textColor,
+      TextStyle? textStyle}) {
     if (textStyle == null) {
       textStyle = TextStyle(
         fontSize: textSize,
@@ -133,24 +133,31 @@ class GoogleMapsCustomMarker {
       textStyle: textStyle,
     );
 
-    if (shape == MarkerShape.circle && (pinOptions != null || bubbleOptions != null)) {
+    if (shape == MarkerShape.circle &&
+        (pinOptions != null || bubbleOptions != null)) {
       if (kDebugMode) {
-        print('GOOGLE_MAPS_CUSTOM_MARKER - WARNING: pin or bubble options supplied to a circle marker');
+        print(
+            'GOOGLE_MAPS_CUSTOM_MARKER - WARNING: pin or bubble options supplied to a circle marker');
       }
     }
-    if(shape == MarkerShape.pin && (circleOptions != null || bubbleOptions != null)) {
+    if (shape == MarkerShape.pin &&
+        (circleOptions != null || bubbleOptions != null)) {
       if (kDebugMode) {
-        print('GOOGLE_MAPS_CUSTOM_MARKER - WARNING: circle or bubble options supplied to a pin marker');
+        print(
+            'GOOGLE_MAPS_CUSTOM_MARKER - WARNING: circle or bubble options supplied to a pin marker');
       }
     }
-    if(shape == MarkerShape.bubble && (circleOptions != null || pinOptions != null)) {
+    if (shape == MarkerShape.bubble &&
+        (circleOptions != null || pinOptions != null)) {
       if (kDebugMode) {
-        print('GOOGLE_MAPS_CUSTOM_MARKER - WARNING: circle or pin options supplied to a bubble marker');
+        print(
+            'GOOGLE_MAPS_CUSTOM_MARKER - WARNING: circle or pin options supplied to a bubble marker');
       }
     }
-    if(shape == MarkerShape.bubble && title == null) {
+    if (shape == MarkerShape.bubble && title == null) {
       if (kDebugMode) {
-        print('GOOGLE_MAPS_CUSTOM_MARKER - WARNING: bubble marker created without a title. Consider using pin instead.');
+        print(
+            'GOOGLE_MAPS_CUSTOM_MARKER - WARNING: bubble marker created without a title. Consider using pin instead.');
       }
     }
 
@@ -177,7 +184,8 @@ class GoogleMapsCustomMarker {
           circleOptions ??= CircleMarkerOptions();
 
           // Draw circle with text inside
-          final double diameter = circleOptions.diameter ?? painter.width + padding;
+          final double diameter =
+              circleOptions.diameter ?? painter.width + padding;
           final double radius = diameter / 2;
 
           // Full bitmap dimensions including shadow
@@ -188,7 +196,8 @@ class GoogleMapsCustomMarker {
           if (enableShadow) {
             final Paint shadowPaint = Paint()
               ..color = shadowColor
-              ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, shadowBlur / 2);
+              ..maskFilter =
+                  ui.MaskFilter.blur(ui.BlurStyle.normal, shadowBlur / 2);
             canvas.drawCircle(
               Offset(bitmapWidth / 2, bitmapHeight / 2),
               radius,
@@ -214,10 +223,11 @@ class GoogleMapsCustomMarker {
 
           // Convert canvas to image
           final ui.Image img = await pictureRecorder.endRecording().toImage(
-            bitmapWidth.toInt(),
-            bitmapHeight.toInt(),
-          );
-          final ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+                bitmapWidth.toInt(),
+                bitmapHeight.toInt(),
+              );
+          final ByteData? byteData =
+              await img.toByteData(format: ui.ImageByteFormat.png);
           if (byteData == null) {
             throw Exception('Failed to convert image to ByteData');
           }
@@ -239,43 +249,49 @@ class GoogleMapsCustomMarker {
 
           // Pin shape: circle with a triangle (like a pin icon)
 
-          final double diameter = pinOptions.diameter ?? painter.width + padding;
+          final double diameter =
+              pinOptions.diameter ?? painter.width + padding;
           final double radius = diameter / 2;
-          final double pinHeight = radius;//anchorTriangleHeight;
+          final double pinHeight = radius; //anchorTriangleHeight;
 
           // Full bitmap dimensions including shadow and anchor
           final double bitmapWidth = diameter + shadowNeededSpace * 2;
-          final double bitmapHeight = diameter + shadowNeededSpace * 2 + pinHeight;
+          final double bitmapHeight =
+              diameter + shadowNeededSpace * 2 + pinHeight;
 
           // Draw shadow
           if (enableShadow) {
             final Paint shadowPaint = Paint()
               ..color = shadowColor
-              ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, shadowBlur / 2);
+              ..maskFilter =
+                  ui.MaskFilter.blur(ui.BlurStyle.normal, shadowBlur / 2);
 
             //Pin shadow
             var arrowPath = Path();
             arrowPath.moveTo(
               shadowNeededSpace,
-              shadowNeededSpace + diameter/2,
+              shadowNeededSpace + diameter / 2,
             );
             arrowPath.arcTo(
-              Rect.fromCircle(center: Offset(bitmapWidth / 2, shadowNeededSpace + diameter / 2), radius: diameter / 2), // Semicircle bounds
+              Rect.fromCircle(
+                  center:
+                      Offset(bitmapWidth / 2, shadowNeededSpace + diameter / 2),
+                  radius: diameter / 2), // Semicircle bounds
               -pi, // Start angle (π for semicircle starting on the left)
-              pi,  // Sweep angle (draw a full semicircle)
+              pi, // Sweep angle (draw a full semicircle)
               false, // Do not force the start to be a new sub-path
             );
             arrowPath.quadraticBezierTo(
-              bitmapWidth-shadowNeededSpace, //control point
-              shadowNeededSpace + diameter/5 * 4,
+              bitmapWidth - shadowNeededSpace, //control point
+              shadowNeededSpace + diameter / 5 * 4,
               bitmapWidth / 2, //end point
               shadowNeededSpace + diameter + pinHeight,
             );
             arrowPath.quadraticBezierTo(
               shadowNeededSpace, //control point
-              shadowNeededSpace + diameter/5 * 4,
+              shadowNeededSpace + diameter / 5 * 4,
               shadowNeededSpace, //end point
-              shadowNeededSpace + diameter/2,
+              shadowNeededSpace + diameter / 2,
             );
             arrowPath.close();
             canvas.drawPath(arrowPath, shadowPaint);
@@ -285,25 +301,28 @@ class GoogleMapsCustomMarker {
           var arrowPath = Path();
           arrowPath.moveTo(
             shadowNeededSpace,
-            shadowNeededSpace + diameter/2,
+            shadowNeededSpace + diameter / 2,
           );
           arrowPath.arcTo(
-            Rect.fromCircle(center: Offset(bitmapWidth / 2, shadowNeededSpace + diameter / 2), radius: diameter / 2), // Semicircle bounds
+            Rect.fromCircle(
+                center:
+                    Offset(bitmapWidth / 2, shadowNeededSpace + diameter / 2),
+                radius: diameter / 2), // Semicircle bounds
             -pi, // Start angle (π for semicircle starting on the left)
-            pi,  // Sweep angle (draw a full semicircle)
+            pi, // Sweep angle (draw a full semicircle)
             false, // Do not force the start to be a new sub-path
           );
           arrowPath.quadraticBezierTo(
-            bitmapWidth-shadowNeededSpace, //control point
-            shadowNeededSpace + diameter/5 * 4,
+            bitmapWidth - shadowNeededSpace, //control point
+            shadowNeededSpace + diameter / 5 * 4,
             bitmapWidth / 2, //end point
             shadowNeededSpace + diameter + pinHeight,
           );
           arrowPath.quadraticBezierTo(
             shadowNeededSpace, //control point
-            shadowNeededSpace + diameter/5 * 4,
+            shadowNeededSpace + diameter / 5 * 4,
             shadowNeededSpace, //end point
-            shadowNeededSpace + diameter/2,
+            shadowNeededSpace + diameter / 2,
           );
           arrowPath.close();
           canvas.drawPath(arrowPath, Paint()..color = backgroundColor);
@@ -329,10 +348,11 @@ class GoogleMapsCustomMarker {
 
           // Convert canvas to image
           final ui.Image img = await pictureRecorder.endRecording().toImage(
-            bitmapWidth.toInt(),
-            bitmapHeight.toInt(),
-          );
-          final ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+                bitmapWidth.toInt(),
+                bitmapHeight.toInt(),
+              );
+          final ByteData? byteData =
+              await img.toByteData(format: ui.ImageByteFormat.png);
           if (byteData == null) {
             throw Exception('Failed to convert image to ByteData');
           }
@@ -363,7 +383,11 @@ class GoogleMapsCustomMarker {
           // Full bitmap dimensions including shadow space and anchor
           final double extraPadding = enableShadow ? shadowNeededSpace : 8;
           final double bitmapWidth = bubbleWidth + extraPadding * 2;
-          final double bitmapHeight = bubbleHeight + extraPadding * 2 + (bubbleOptions.enableAnchorTriangle ? bubbleOptions.anchorTriangleHeight : 0);
+          final double bitmapHeight = bubbleHeight +
+              extraPadding * 2 +
+              (bubbleOptions.enableAnchorTriangle
+                  ? bubbleOptions.anchorTriangleHeight
+                  : 0);
 
           ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
           Canvas canvas = Canvas(pictureRecorder);
@@ -372,7 +396,8 @@ class GoogleMapsCustomMarker {
           if (enableShadow) {
             final Paint shadowPaint = Paint()
               ..color = shadowColor
-              ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, shadowBlur / 2);
+              ..maskFilter =
+                  ui.MaskFilter.blur(ui.BlurStyle.normal, shadowBlur / 2);
 
             canvas.drawRRect(
               RRect.fromLTRBAndCorners(
@@ -408,7 +433,9 @@ class GoogleMapsCustomMarker {
           if (bubbleOptions.enableAnchorTriangle) {
             var arrowPath = Path();
             arrowPath.moveTo(
-              shadowBlur + bubbleWidth / 2 - bubbleOptions.anchorTriangleWidth / 2,
+              shadowBlur +
+                  bubbleWidth / 2 -
+                  bubbleOptions.anchorTriangleWidth / 2,
               shadowBlur + bubbleHeight,
             );
             arrowPath.lineTo(
@@ -416,7 +443,9 @@ class GoogleMapsCustomMarker {
               shadowBlur + bubbleHeight + bubbleOptions.anchorTriangleHeight,
             );
             arrowPath.lineTo(
-              shadowBlur + bubbleWidth / 2 + bubbleOptions.anchorTriangleWidth / 2,
+              shadowBlur +
+                  bubbleWidth / 2 +
+                  bubbleOptions.anchorTriangleWidth / 2,
               shadowBlur + bubbleHeight,
             );
             arrowPath.close();
@@ -426,23 +455,29 @@ class GoogleMapsCustomMarker {
           // Draw the text, shifted for shadow
           painter.paint(
             canvas,
-            Offset(shadowBlur + paddingHorizontal / 2, shadowBlur + paddingVertical / 2),
+            Offset(shadowBlur + paddingHorizontal / 2,
+                shadowBlur + paddingVertical / 2),
           );
 
           // Convert the canvas to an image
           final ui.Image img = await pictureRecorder.endRecording().toImage(
-            bitmapWidth.toInt(),
-            bitmapHeight.toInt(),
-          );
+                bitmapWidth.toInt(),
+                bitmapHeight.toInt(),
+              );
 
-          final ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+          final ByteData? byteData =
+              await img.toByteData(format: ui.ImageByteFormat.png);
           if (byteData == null) {
             throw Exception('Failed to convert image to ByteData');
           }
 
-          BitmapDescriptor bitmap = BitmapDescriptor.bytes(byteData.buffer.asUint8List(), imagePixelRatio: imagePixelRatio);
+          BitmapDescriptor bitmap = BitmapDescriptor.bytes(
+              byteData.buffer.asUint8List(),
+              imagePixelRatio: imagePixelRatio);
 
-          double anchorY = bubbleOptions.enableAnchorTriangle ? 1 - extraPadding / bitmapHeight : 0.5;
+          double anchorY = bubbleOptions.enableAnchorTriangle
+              ? 1 - extraPadding / bitmapHeight
+              : 0.5;
           return marker.copyWith(
             iconParam: bitmap,
             anchorParam: Offset(0.5, anchorY),
@@ -451,6 +486,3 @@ class GoogleMapsCustomMarker {
     }
   }
 }
-
-
-

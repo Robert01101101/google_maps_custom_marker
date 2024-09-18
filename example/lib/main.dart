@@ -35,7 +35,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final Set<Marker> _markers = {};
   static const LatLng _center = LatLng(49.281986774819636, -123.1254609406434);
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
   Future<void>? _addMarkersFuture;
 
   static const CameraPosition _position = CameraPosition(
@@ -55,10 +56,11 @@ class _MyHomePageState extends State<MyHomePage> {
       Marker pinMarker = await GoogleMapsCustomMarker.createCustomMarker(
         marker: Marker(
           markerId: MarkerId('pin_$i'),
-          position: LatLng(_center.latitude + 0.03, _center.longitude - 0.025 + i * 0.01),
+          position: LatLng(
+              _center.latitude + 0.03, _center.longitude - 0.025 + i * 0.01),
         ),
         shape: MarkerShape.pin,
-        pinOptions: PinMarkerOptions(diameter: 14 + i*8),
+        pinOptions: PinMarkerOptions(diameter: 14 + i * 8),
       );
       _markers.add(pinMarker);
     }
@@ -68,10 +70,12 @@ class _MyHomePageState extends State<MyHomePage> {
       Marker pinMarker = await GoogleMapsCustomMarker.createCustomMarker(
         marker: Marker(
           markerId: MarkerId('pin_labeled_$i'),
-          position: LatLng(_center.latitude + 0.02, _center.longitude - 0.025 + i * 0.01),
+          position: LatLng(
+              _center.latitude + 0.02, _center.longitude - 0.025 + i * 0.01),
         ),
         shape: MarkerShape.pin,
-        backgroundColor: GoogleMapsCustomMarkerColor.markerColors[i % GoogleMapsCustomMarkerColor.markerColors.length],
+        backgroundColor: GoogleMapsCustomMarkerColor
+            .markerColors[i % GoogleMapsCustomMarkerColor.markerColors.length],
         title: (i + 1).toString(),
       );
       _markers.add(pinMarker);
@@ -82,17 +86,19 @@ class _MyHomePageState extends State<MyHomePage> {
       Marker pinMarker = await GoogleMapsCustomMarker.createCustomMarker(
         marker: Marker(
           markerId: MarkerId('pin_labeled_$i'),
-          position: LatLng(_center.latitude + 0.015, _center.longitude - 0.025 + i * 0.01),
+          position: LatLng(
+              _center.latitude + 0.015, _center.longitude - 0.025 + i * 0.01),
         ),
         shape: MarkerShape.circle,
-        backgroundColor: GoogleMapsCustomMarkerColor.markerColors[i % GoogleMapsCustomMarkerColor.markerColors.length],
+        backgroundColor: GoogleMapsCustomMarkerColor
+            .markerColors[i % GoogleMapsCustomMarkerColor.markerColors.length],
         title: (i + 1).toString(),
       );
       _markers.add(pinMarker);
     }
 
     // demonstrating centered alignment of all marker shapes
-    _markers.add( await GoogleMapsCustomMarker.createCustomMarker(
+    _markers.add(await GoogleMapsCustomMarker.createCustomMarker(
       marker: const Marker(
         markerId: MarkerId('centered_bubble_no_anchor'),
         position: _center,
@@ -101,10 +107,9 @@ class _MyHomePageState extends State<MyHomePage> {
       shape: MarkerShape.bubble,
       backgroundColor: GoogleMapsCustomMarkerColor.markerGrey,
       title: 'Centered Bubble without Anchor Triangle',
-      bubbleOptions: BubbleMarkerOptions(
-          enableAnchorTriangle: false),
+      bubbleOptions: BubbleMarkerOptions(enableAnchorTriangle: false),
     ));
-    _markers.add( await GoogleMapsCustomMarker.createCustomMarker(
+    _markers.add(await GoogleMapsCustomMarker.createCustomMarker(
       marker: const Marker(
         markerId: MarkerId('centered_circle'),
         position: _center,
@@ -116,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
         diameter: 18,
       ),
     ));
-    _markers.add( await GoogleMapsCustomMarker.createCustomMarker(
+    _markers.add(await GoogleMapsCustomMarker.createCustomMarker(
       marker: const Marker(
         markerId: MarkerId('centered_bubble'),
         position: _center,
@@ -125,10 +130,9 @@ class _MyHomePageState extends State<MyHomePage> {
       shape: MarkerShape.bubble,
       title: 'Centered Bubble',
       bubbleOptions: BubbleMarkerOptions(
-        anchorTriangleWidth: 82,
-        anchorTriangleHeight: 48),
+          anchorTriangleWidth: 82, anchorTriangleHeight: 48),
     ));
-    _markers.add( await GoogleMapsCustomMarker.createCustomMarker(
+    _markers.add(await GoogleMapsCustomMarker.createCustomMarker(
       marker: const Marker(
         markerId: MarkerId('centered_pin'),
         position: _center,
@@ -139,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ));
 
     // bubble marker
-    _markers.add( await GoogleMapsCustomMarker.createCustomMarker(
+    _markers.add(await GoogleMapsCustomMarker.createCustomMarker(
       marker: Marker(
         markerId: const MarkerId('bubble'),
         position: LatLng(_center.latitude - 0.02, _center.longitude),
@@ -149,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ));
 
     // customized bubble marker
-    _markers.add( await GoogleMapsCustomMarker.createCustomMarker(
+    _markers.add(await GoogleMapsCustomMarker.createCustomMarker(
       marker: Marker(
         markerId: const MarkerId('bubble'),
         position: LatLng(_center.latitude - 0.04, _center.longitude),
@@ -177,23 +181,27 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: FutureBuilder(
-        future: _addMarkersFuture, //wait for markers to load before building the map
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());  // Show loading spinner while markers load
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));  // Display error if marker loading fails
-          } else {
-            return GoogleMap(
-              initialCameraPosition: _position,
-              markers: _markers,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
-            );
-          }
-        }
-      ),
+          future:
+              _addMarkersFuture, //wait for markers to load before building the map
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                  child:
+                      CircularProgressIndicator()); // Show loading spinner while markers load
+            } else if (snapshot.hasError) {
+              return Center(
+                  child: Text(
+                      'Error: ${snapshot.error}')); // Display error if marker loading fails
+            } else {
+              return GoogleMap(
+                initialCameraPosition: _position,
+                markers: _markers,
+                onMapCreated: (GoogleMapController controller) {
+                  _controller.complete(controller);
+                },
+              );
+            }
+          }),
     );
   }
 }
