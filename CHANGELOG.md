@@ -1,6 +1,10 @@
+## 1.0.3
+
+* Changelog formatting fix.
+
 ## 1.0.2
 
-* Added Future<BitmapDescriptorWithAnchor> createCustomBitmap to allow getting only bitmaps.
+* Added createCustomBitmap() to allow getting only bitmaps.
 
 ## 1.0.1
 

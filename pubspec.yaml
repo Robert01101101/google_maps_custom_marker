@@ -1,6 +1,6 @@
 name: google_maps_custom_marker
 description: "A flexible package for creating various shapes of highly customizable markers with optional labels."
-version: 1.0.2
+version: 1.0.3
 repository: "https://github.com/Robert01101101/google_maps_custom_marker"
 issue_tracker: "https://github.com/Robert01101101/google_maps_custom_marker/issues"
 
