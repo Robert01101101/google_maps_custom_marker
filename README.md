@@ -15,6 +15,10 @@ and the Flutter guide for
 
 A flexible package for creating various shapes of highly customizable markers with optional labels.
 
+<p align = "center">
+    <img src="https://github.com/Robert01101101/google_maps_custom_marker/blob/main/example/assets/Screenshot.jpg?raw=true" width="40%" alt="screenshot from example" />
+</p>
+
 ## Features
 
 Use this package in your Flutter app to:
@@ -80,4 +84,5 @@ _markers.addAll([pinMarker, circleMarker, bubbleMarkerCustomized]);
 ## Additional information
 
 This package was developed to help more easily create beautiful, semantic maps. 
+
 If you have suggestions for changes, additions, or would like to contribute, that is more than welcome.

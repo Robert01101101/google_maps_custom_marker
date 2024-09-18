@@ -18,7 +18,7 @@ dependencies:
     # The example app is bundled with the package so we use a path dependency on
     # the parent directory to use the current package's version.
     path: ../
-  google_maps_flutter: ^2.9.0
+  google_maps_flutter: ^2.3.0
 
 dev_dependencies:
   flutter_test:
