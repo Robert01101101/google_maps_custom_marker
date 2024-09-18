@@ -1,3 +1,7 @@
-## 0.0.1
+## 1.0.0
 
-* TODO: Describe initial release.
+* Initial release
+* Dynamically create markers to use with `google_maps_flutter`
+* Add text labels to markers
+* Create circle, pin, and text bubble marker shapes
+* Customize the appearance, including options for colors, padding, shadow, and more
