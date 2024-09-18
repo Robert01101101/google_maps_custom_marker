@@ -52,65 +52,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _addMarkers() async {
-    // Circular markers in the center of the map, for anchor and positioning testing
-    Marker circularAlignmentMarkerLarge = await GoogleMapsCustomMarker.createCustomIconForMarker(
-      type: GoogleMapsCustomMarkerType.circular,
-      marker: const Marker(
-        markerId: MarkerId('marker_1'),
-        position: LatLng(49.281986774819636, -123.1254609406434),
-      ),
-      backgroundColor: Colors.red,
-      size: 32,
-    );
-    Marker circularAlignmentMarker = await GoogleMapsCustomMarker.createCustomIconForMarker(
-      type: GoogleMapsCustomMarkerType.circular,
-      marker: const Marker(
-        markerId: MarkerId('marker_2'),
-        position: LatLng(49.281986774819636, -123.1254609406434),
-      ),
-    );
-    Marker circularAlignmentMarkerSmall = await GoogleMapsCustomMarker.createCustomIconForMarker(
-      type: GoogleMapsCustomMarkerType.circular,
-      marker: const Marker(
-        markerId: MarkerId('marker_3'),
-        position: LatLng(49.281986774819636, -123.1254609406434),
-      ),
-      backgroundColor: Colors.yellow,
-      size: 4,
-    );
-    List<Marker> alignmentCircles = [circularAlignmentMarkerSmall];//[circularAlignmentMarkerLarge, circularAlignmentMarker, circularAlignmentMarkerSmall];
-
-    // A variety of marker configurations
-    Marker circularMarker = await GoogleMapsCustomMarker.createCustomIconForMarker(
-      type: GoogleMapsCustomMarkerType.circular,
-      marker: const Marker(
-        markerId: MarkerId('marker_4'),
-        position: LatLng(49.301986774819636, -123.1454609406434),
-      ),
-    );
-    Marker circularNumberedMarker = await GoogleMapsCustomMarker.createCustomIconForMarker(
-      type: GoogleMapsCustomMarkerType.circularNumbered,
-      marker: const Marker(
-        markerId: MarkerId('marker_5'),
-        position: LatLng(49.301986774819636, -123.1254609406434),
-      ),
-      number: 99,
-    );
-    Marker circularNumberedMarkerCustomized = await GoogleMapsCustomMarker.createCustomIconForMarker(
-      type: GoogleMapsCustomMarkerType.circularNumbered,
-      marker: const Marker(
-        markerId: MarkerId('marker_6'),
-        position: LatLng(49.301986774819636, -123.1054609406434),
-      ),
-      number: 0,
-      textSize: 82,
-      backgroundColor: Colors.green,
-      foregroundColor: Colors.black,
-      size: 64,
-      enableShadow: false,
-      textStyle: const TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.normal),
-      imagePixelRatio: 1.5,
-    );
     Marker textBubbleMarkerUnlabeledPin = await GoogleMapsCustomMarker.createCustomMarker(
       marker: const Marker(
         markerId: MarkerId('marker_7'),
@@ -133,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
         position: LatLng(49.281986774819636, -123.1054609406434),
       ),
       title: '23',
-      circleDiameter: 28,
+      pinOptions: PinMarkerOptions(diameter: 28),
       textSize: 14,
       shape: MarkerShape.pin,
     );
@@ -150,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
         markerId: MarkerId('marker_11'),
         position: LatLng(49.281986774819636, -123.1454609406434),
       ),
-      circleDiameter: 8,
+      circleOptions: CircleMarkerOptions(diameter: 8),
       shape: MarkerShape.circle,
       backgroundColor: Colors.yellowAccent,
     );
@@ -162,11 +103,10 @@ class _MyHomePageState extends State<MyHomePage> {
       shape: MarkerShape.bubble,
       title: 'Hello World!',
     );
-    List<Marker> variousMarkers = [circularMarker, circularNumberedMarker, circularNumberedMarkerCustomized,
-      textBubbleMarkerUnlabeledPin, textBubbleMarkerPin, textBubbleMarkerPinScaled, textBubbleMarkerCircle, textBubbleMarkerUnlabeledCircle, textBubbleMarker];
+    List<Marker> variousMarkers = [textBubbleMarkerUnlabeledPin, textBubbleMarkerPin, textBubbleMarkerPinScaled,
+      textBubbleMarkerCircle, textBubbleMarkerUnlabeledCircle, textBubbleMarker];
 
     setState(() {
-      //_markers.addAll(alignmentCircles);
       _markers.addAll(variousMarkers);
     });
   }

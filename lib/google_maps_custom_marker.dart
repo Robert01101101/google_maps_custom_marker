@@ -8,193 +8,58 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:ui' as ui;
 
-enum GoogleMapsCustomMarkerType { circular, circularNumbered }
 enum MarkerShape { circle, pin, bubble }
 
-/// A utility class to create custom BitmapDescriptors to use with markers for Google Maps.
+class CircleMarkerOptions {
+  final double? diameter;
+  /// Configures additional options for a circle marker.
+  /// The [diameter] parameter specifies the diameter of the circle.
+  /// Setting the diameter will require you to ensure an appropriate text size to fit the optional title.
+  /// If not specified, the diameter will be calculated based on the text size and padding.
+  CircleMarkerOptions({this.diameter});
+}
+
+class PinMarkerOptions {
+  final Color pinDotColor;
+  final double? diameter;
+
+  /// Configures additional options for a pin marker.
+  /// The [diameter] parameter specifies the diameter of the circle making up the top of the pin.
+  /// Setting the diameter will require you to ensure an appropriate text size to fit the optional title.
+  /// If not specified, the diameter will be calculated based on the text size and padding.
+  /// If no title is provided, a small dot will be drawn at the top of the pin, colored by [pinDotColor].
+  PinMarkerOptions({
+    this.pinDotColor = Colors.white,
+    this.diameter,
+  });
+}
+
+class BubbleMarkerOptions {
+  final bool enableAnchorTriangle;
+  final double anchorTriangleWidth;
+  final double anchorTriangleHeight;
+  final double cornerRadius;
+
+  /// Configures additional options for a bubble marker.
+  /// The [enableAnchorTriangle] parameter enables a triangle at the bottom of the bubble.
+  /// The [anchorTriangleWidth] and [anchorTriangleHeight] parameters specify the dimensions of the triangle.
+  /// If no triangle is shown, the bubble is anchored to its center, otherwise it's anchored by the triangle.
+  BubbleMarkerOptions({
+    this.enableAnchorTriangle = true,
+    this.anchorTriangleWidth = 16,
+    this.anchorTriangleHeight = 16,
+    this.cornerRadius = 64,
+  });
+}
+
+/// A collection of preset colors for custom markers.
+class CustomMarkerColorPreset {
+  static const Color markerRed = Color(0xffc32929);
+  static const Color markerShadow = Color(0xaa000000);
+}
+
+/// A utility class to create custom markers for Google Maps.
 class GoogleMapsCustomMarker {
-
-  /// Creates a custom BitmapDescriptor for a marker, assigns it as the icon, and sets the correct anchor.
-  ///
-  /// [type] is the type of custom marker to create.
-  /// [marker] is the marker to assign the custom icon to, it will be returned with the new icon and anchor assigned to it.
-  /// [number] is the number to display in the center of the marker, and is required for circularNumbered marker types.
-  /// [title] is the text to display in the center of the marker, and is required for textBubble marker types.
-  /// [backgroundColor] is the color of the circle.
-  /// [foregroundColor] is the color of the text.
-  /// [size] is the size of the marker.
-  /// [textSizeMultiple] is the text size proportional to the marker, and can be used to control padding between the text and its encompassing circle.
-  /// [enableShadow] is a flag to enable shadow.
-  /// [shadowColor] is the color of the shadow.
-  /// [shadowBlur] is the blur radius of the shadow.
-  /// [textStyle] is the style of the text.
-  /// [labelPadding] is the padding around the text in the textBubble marker.
-  /// [imagePixelRatio] is the scale of the image relative to the device's pixel ratio, and defaults to the natural resolution if not specified.
-  static Future<Marker> createCustomIconForMarker( {
-    required GoogleMapsCustomMarkerType type,
-    required Marker marker,
-    int? number,
-    String? title,
-    Color backgroundColor = Colors.lightBlue,
-    Color foregroundColor = Colors.white,
-    double size = 48,
-    double textSize = 24,
-    bool enableShadow = true,
-    Color shadowColor = const Color(0xA0000000),
-    double shadowBlur = 6,
-    TextStyle? textStyle,
-    double? labelPadding,
-    double? imagePixelRatio})
-  async {
-    try {
-      if (type == GoogleMapsCustomMarkerType.circularNumbered && number == null) {
-        throw Exception('GOOGLE_MAPS_CUSTOM_MARKER EXCEPTION: Number must be provided for a circular numbered marker.');
-      }
-      /*if (type == GoogleMapsCustomMarkerType.textBubble && title == null) {
-        throw Exception('GOOGLE_MAPS_CUSTOM_MARKER EXCEPTION: Title must be provided for a text bubble marker.');
-      }*/
-      BitmapDescriptor bitmap;
-      switch (type) {
-        case GoogleMapsCustomMarkerType.circular:
-          bitmap = await _createCircularMarkerBitmap(
-            backgroundColor: backgroundColor,
-            size: size,
-            textSize: textSize,
-            enableShadow: enableShadow,
-            shadowColor: shadowColor,
-            shadowBlur: shadowBlur,
-            imagePixelRatio: imagePixelRatio,
-          );
-          break;
-        case GoogleMapsCustomMarkerType.circularNumbered:
-          bitmap = await _createCircularNumberedMarkerBitmap(
-            number: number!,
-            backgroundColor: backgroundColor,
-            foregroundColor: foregroundColor,
-            size: size,
-            textSize: textSize,
-            enableShadow: enableShadow,
-            shadowColor: shadowColor,
-            shadowBlur: shadowBlur,
-            textStyle: textStyle,
-            imagePixelRatio: imagePixelRatio,
-          );
-          break;
-          /*
-        case GoogleMapsCustomMarkerType.textBubble:
-          bitmap = await _createAnchoredTextBubbleMarkerBitmap(
-            title: title!,
-            backgroundColor: backgroundColor,
-            foregroundColor: foregroundColor,
-            textSize: size,
-            enableShadow: enableShadow,
-            shadowColor: shadowColor,
-            shadowBlur: shadowBlur,
-            textStyle: textStyle,
-            padding: labelPadding ?? 40,
-            imagePixelRatio: imagePixelRatio,
-          );
-          break;*/
-      }
-
-      return marker.copyWith(
-        iconParam: bitmap,
-        anchorParam:  const Offset(0.5, 0.5),//type == GoogleMapsCustomMarkerType.textBubble ? const Offset(0.5, 1) : const Offset(0.5, 0.5),
-      );
-    } catch (e) {
-      print(e);
-      return marker;
-    }
-  }
-
-  /// Draws a Circle with an optional shadow, and returns the bitmap size which includes the shadow.
-  ///
-  /// [backgroundColor] is the color of the circle.
-  /// [size] is the size of the marker.
-  /// [enableShadow] is a flag to enable shadow.
-  /// [shadowColor] is the color of the shadow.
-  /// [shadowBlur] is the blur radius of the shadow.
-  static double _drawCircle({
-    required Canvas canvas,
-    required Color backgroundColor,
-    required double size,
-    required bool enableShadow,
-    required Color shadowColor,
-    required double shadowBlur})
-  {
-    final double radiusSize = size; // Smaller size for the marker
-    final double circleSize = radiusSize * 2; // Circle diameter
-    final int shadowSpacer = enableShadow ? (shadowBlur*2).toInt() : 0;
-    final double bitmapSize = circleSize + shadowSpacer;
-
-    if (enableShadow){
-      // Draw a shadow (a blurred circle behind the main circle)
-      final Paint shadowPaint = Paint()
-        ..color = shadowColor // Shadow color with some transparency
-        ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, shadowBlur/2); // Adjust blur radius
-
-      canvas.drawCircle(
-        Offset(bitmapSize / 2, bitmapSize / 2),
-        radiusSize,
-        shadowPaint,
-      );
-    }
-
-    // Draw the main circle
-    final Paint paint = Paint()..color = backgroundColor;
-    canvas.drawCircle(
-      Offset(bitmapSize / 2, bitmapSize / 2),
-      radiusSize,
-      paint,
-    );
-
-    return bitmapSize;
-  }
-
-  /// Draws an anchored bubble with an optional shadow, and returns the bitmap size which includes the shadow.
-  ///
-  /// [backgroundColor] is the color of the bubble.
-  /// [size] is the size of the marker.
-  /// [enableShadow] is a flag to enable shadow.
-  /// [shadowColor] is the color of the shadow.
-  /// [shadowBlur] is the blur radius of the shadow.
-  static double _drawAnchoredBubble({
-    required Canvas canvas,
-    required Color backgroundColor,
-    required double size,
-    required bool enableShadow,
-    required Color shadowColor,
-    required double shadowBlur})
-  {
-    final double radiusSize = size; // Smaller size for the marker
-    final double circleSize = radiusSize * 2; // Circle diameter
-    final int shadowSpacer = enableShadow ? (shadowBlur*2).toInt() : 0;
-    final double bitmapSize = circleSize + shadowSpacer;
-
-    if (enableShadow){
-      // Draw a shadow (a blurred circle behind the main circle)
-      final Paint shadowPaint = Paint()
-        ..color = shadowColor // Shadow color with some transparency
-        ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, shadowBlur/2); // Adjust blur radius
-
-      canvas.drawCircle(
-        Offset(bitmapSize / 2, bitmapSize / 2),
-        radiusSize,
-        shadowPaint,
-      );
-    }
-
-    // Draw the main circle
-    final Paint paint = Paint()..color = backgroundColor;
-    canvas.drawCircle(
-      Offset(bitmapSize / 2, bitmapSize / 2),
-      radiusSize,
-      paint,
-    );
-
-    return bitmapSize;
-  }
-
   static TextStyle _createTextStyle({
     required double textSize,
     required Color textColor,
@@ -215,145 +80,60 @@ class GoogleMapsCustomMarker {
     return textStyle;
   }
 
-  /// Creates a BitmapDescriptor for a circular marker.
+  /// Creates a custom marker for use with Google Maps.
   ///
-  /// [backgroundColor] is the color of the circle.
-  /// [size] is the size of the marker.
-  /// [enableShadow] is a flag to enable shadow.
-  /// [shadowColor] is the color of the shadow.
-  /// [shadowBlur] is the blur radius of the shadow.
-  /// [imagePixelRatio] is the scale of the image relative to the device's pixel ratio, and defaults to the natural resolution if not specified.
-  static Future<BitmapDescriptor> _createCircularMarkerBitmap({
-    required Color backgroundColor,
-    required double size,
-    required double textSize,
-    required bool enableShadow,
-    required Color shadowColor,
-    required double shadowBlur,
-    double? imagePixelRatio})
-  async {
-    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
-
-    final bitmapSize = _drawCircle(
-      canvas: canvas,
-      backgroundColor: backgroundColor,
-      size: size,
-      enableShadow: enableShadow,
-      shadowColor: shadowColor,
-      shadowBlur: shadowBlur,
-    );
-
-    int imgSize = bitmapSize.toInt();
-    // Convert the canvas to an image at the original size
-    final ui.Image img = await pictureRecorder.endRecording().toImage(imgSize, imgSize);
-
-    // Convert to ByteData directly from the original image
-    final ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-    if (byteData == null) {
-      throw Exception('Failed to convert image to ByteData');
-    }
-
-    return BitmapDescriptor.bytes(byteData.buffer.asUint8List(), imagePixelRatio: imagePixelRatio);
-  }
-
-  /// Creates a BitmapDescriptor for a circular marker with a number in the center.
-  ///
-  /// [number] is the number to display in the center of the marker.
-  /// [backgroundColor] is the color of the circle.
-  /// [foregroundColor] is the color of the text.
-  /// [size] is the size of the marker.
-  /// [textSizeMultiple] is the text size proportional to the marker, and can be used to control padding between the text and its encompassing circle.
-  /// [enableShadow] is a flag to enable shadow.
-  /// [shadowColor] is the color of the shadow.
-  /// [shadowBlur] is the blur radius of the shadow.
-  /// [textStyle] is the style of the text.
-  /// [imagePixelRatio] is the scale of the image relative to the device's pixel ratio, and defaults to the natural resolution if not specified.
-  static Future<BitmapDescriptor> _createCircularNumberedMarkerBitmap({
-    required int number,
-    required Color backgroundColor,
-    required Color foregroundColor,
-    required double size,
-    required double textSize,
-    required bool enableShadow,
-    required Color shadowColor,
-    required double shadowBlur,
-    TextStyle? textStyle,
-    double? imagePixelRatio})
-  async {
-    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
-
-    final bitmapSize = _drawCircle(
-      canvas: canvas,
-      backgroundColor: backgroundColor,
-      size: size,
-      enableShadow: enableShadow,
-      shadowColor: shadowColor,
-      shadowBlur: shadowBlur,
-    );
-
-    // Draw the number with appropriate size
-    final TextPainter textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-    );
-    textStyle = _createTextStyle(
-      textSize: textSize,
-      textColor: foregroundColor,
-      textStyle: textStyle,
-    );
-    textPainter.text = TextSpan(
-      text: number.toString(),
-      style: textStyle,
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(
-        (bitmapSize - textPainter.width) / 2,
-        (bitmapSize - textPainter.height) / 2,
-      ),
-    );
-
-    // Convert the canvas to an image at the original size
-    int imgSize = bitmapSize.toInt();
-    final ui.Image img = await pictureRecorder.endRecording().toImage(imgSize, imgSize);
-
-    // Convert to ByteData directly from the original image
-    final ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-    if (byteData == null) {
-      throw Exception('Failed to convert image to ByteData');
-    }
-
-    return BitmapDescriptor.bytes(byteData.buffer.asUint8List(), imagePixelRatio: imagePixelRatio);
-  }
-
-
+  /// Create a marker, and pass it to the [marker] parameter.
+  /// It will be returned with the new icon and appropriate anchor.
+  /// The shape and applicable options are determined by the [shape] parameter.
+  /// The optional [title] will be displayed inside the marker.
+  /// The marker will use the [backgroundColor], and the title will use the [foregroundColor] and [textSize].
+  /// You can also provide a custom [textStyle] for further text style customization.
+  /// The [enableShadow] parameter enables a shadow behind the marker, using [shadowColor], blurred by [shadowBlur] radius.
+  /// The [padding] parameter is the padding around the text inside the marker.
+  /// For circles and pins, padding is ignored if they have a diameter specified through their options.
+  /// The [imagePixelRatio] parameter is the pixel ratio of the generated image.
+  /// It defaults to the natural resolution if not specified.
+  /// Try changing the imagePixelRatio, if you encounter unexpected scaling on certain displays.
+  /// Depending on the shape, there are additional options available for customization:
+  /// [circleOptions], [pinOptions] and [bubbleOptions].
   static Future<Marker> createCustomMarker({
     required Marker marker,
+    required MarkerShape shape,
     String? title,
     Color backgroundColor = Colors.blueGrey,
     Color foregroundColor = Colors.white,
-    Color pinDotColor = Colors.white, //only if pin, only if no label
     double textSize = 20,
     bool enableShadow = true,
-    Color shadowColor = const Color(0xaa000000),
-    double shadowBlur = 12, //TODO support large shadow values
-    bool enableAnchorTriangle = true,
-    double anchorTriangleWidth = 16, //bubble only
-    double anchorTriangleHeight = 16, //bubble only
+    Color shadowColor = CustomMarkerColorPreset.markerShadow,
+    double shadowBlur = 12,
     double padding = 32,
-    double cornerRadius = 64,
     TextStyle? textStyle,
-    MarkerShape shape = MarkerShape.pin,
-    double? circleDiameter, //if not specified, it will fit to text plus padding
-    double? imagePixelRatio})
-  async {
+    double? imagePixelRatio,
+    CircleMarkerOptions? circleOptions,
+    PinMarkerOptions? pinOptions,
+    BubbleMarkerOptions? bubbleOptions,
+  }) async {
     textStyle = _createTextStyle(
       textSize: textSize,
       textColor: foregroundColor,
       textStyle: textStyle,
     );
+
+    if (shape == MarkerShape.circle && (pinOptions != null || bubbleOptions != null)) {
+      if (kDebugMode) {
+        print('GOOGLE_MAPS_CUSTOM_MARKER - WARNING: pin or bubble options supplied to a circle marker');
+      }
+    }
+    if(shape == MarkerShape.pin && (circleOptions != null || bubbleOptions != null)) {
+      if (kDebugMode) {
+        print('GOOGLE_MAPS_CUSTOM_MARKER - WARNING: circle or bubble options supplied to a pin marker');
+      }
+    }
+    if(shape == MarkerShape.bubble && (circleOptions != null || pinOptions != null)) {
+      if (kDebugMode) {
+        print('GOOGLE_MAPS_CUSTOM_MARKER - WARNING: circle or pin options supplied to a bubble marker');
+      }
+    }
 
     final double shadowNeededSpace = enableShadow ? shadowBlur : 0;
 
@@ -375,8 +155,10 @@ class GoogleMapsCustomMarker {
     switch (shape) {
       case MarkerShape.circle:
         {
+          circleOptions ??= CircleMarkerOptions();
+
           // Draw circle with text inside
-          final double diameter = circleDiameter ?? painter.width + padding;
+          final double diameter = circleOptions.diameter ?? painter.width + padding;
           final double radius = diameter / 2;
 
           // Full bitmap dimensions including shadow
@@ -428,15 +210,17 @@ class GoogleMapsCustomMarker {
 
           return marker.copyWith(
             iconParam: bitmap,
-            anchorParam: Offset(0.5, 0.5), // Center of the circle
+            anchorParam: const Offset(0.5, 0.5), // Center of the circle
           );
         }
 
       case MarkerShape.pin:
         {
+          pinOptions ??= PinMarkerOptions();
+
           // Pin shape: circle with a triangle (like a pin icon)
 
-          final double diameter = circleDiameter ?? painter.width + padding;
+          final double diameter = pinOptions.diameter ?? painter.width + padding;
           final double radius = diameter / 2;
           final double pinHeight = radius;//anchorTriangleHeight;
 
@@ -511,7 +295,7 @@ class GoogleMapsCustomMarker {
             canvas.drawCircle(
               Offset(bitmapWidth / 2, shadowNeededSpace + radius),
               pinDotCircleRadius,
-              Paint()..color = pinDotColor,
+              Paint()..color = pinOptions.pinDotColor,
             );
           }
 
@@ -548,6 +332,8 @@ class GoogleMapsCustomMarker {
 
       case MarkerShape.bubble:
         {
+          bubbleOptions ??= BubbleMarkerOptions();
+
           final double paddingHorizontal = padding;
           final double paddingVertical = padding / 2;
           int textWidth = painter.width.toInt();
@@ -557,7 +343,7 @@ class GoogleMapsCustomMarker {
 
           // Full bitmap dimensions including shadow space and anchor
           final double bitmapWidth = bubbleWidth + shadowNeededSpace * 2;
-          final double bitmapHeight = bubbleHeight + shadowNeededSpace * 2 + (enableAnchorTriangle ? anchorTriangleHeight : 0);
+          final double bitmapHeight = bubbleHeight + shadowNeededSpace * 2 + (bubbleOptions.enableAnchorTriangle ? bubbleOptions.anchorTriangleHeight : 0);
 
           ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
           Canvas canvas = Canvas(pictureRecorder);
@@ -574,10 +360,10 @@ class GoogleMapsCustomMarker {
                 shadowBlur,
                 bubbleWidth + shadowBlur,
                 bubbleHeight + shadowBlur,
-                bottomLeft: Radius.circular(cornerRadius),
-                bottomRight: Radius.circular(cornerRadius),
-                topLeft: Radius.circular(cornerRadius),
-                topRight: Radius.circular(cornerRadius),
+                bottomLeft: Radius.circular(bubbleOptions.cornerRadius),
+                bottomRight: Radius.circular(bubbleOptions.cornerRadius),
+                topLeft: Radius.circular(bubbleOptions.cornerRadius),
+                topRight: Radius.circular(bubbleOptions.cornerRadius),
               ),
               shadowPaint,
             );
@@ -590,27 +376,27 @@ class GoogleMapsCustomMarker {
               shadowBlur,
               bubbleWidth + shadowBlur,
               bubbleHeight + shadowBlur,
-              bottomLeft: Radius.circular(cornerRadius),
-              bottomRight: Radius.circular(cornerRadius),
-              topLeft: Radius.circular(cornerRadius),
-              topRight: Radius.circular(cornerRadius),
+              bottomLeft: Radius.circular(bubbleOptions.cornerRadius),
+              bottomRight: Radius.circular(bubbleOptions.cornerRadius),
+              topLeft: Radius.circular(bubbleOptions.cornerRadius),
+              topRight: Radius.circular(bubbleOptions.cornerRadius),
             ),
             Paint()..color = backgroundColor,
           );
 
           // Draw the anchor triangle
-          if (enableAnchorTriangle) {
+          if (bubbleOptions.enableAnchorTriangle) {
             var arrowPath = Path();
             arrowPath.moveTo(
-              shadowBlur + bubbleWidth / 2 - anchorTriangleWidth / 2,
+              shadowBlur + bubbleWidth / 2 - bubbleOptions.anchorTriangleWidth / 2,
               shadowBlur + bubbleHeight,
             );
             arrowPath.lineTo(
               shadowBlur + bubbleWidth / 2,
-              shadowBlur + bubbleHeight + anchorTriangleHeight,
+              shadowBlur + bubbleHeight + bubbleOptions.anchorTriangleHeight,
             );
             arrowPath.lineTo(
-              shadowBlur + bubbleWidth / 2 + anchorTriangleWidth / 2,
+              shadowBlur + bubbleWidth / 2 + bubbleOptions.anchorTriangleWidth / 2,
               shadowBlur + bubbleHeight,
             );
             arrowPath.close();
@@ -636,7 +422,7 @@ class GoogleMapsCustomMarker {
 
           BitmapDescriptor bitmap = BitmapDescriptor.bytes(byteData.buffer.asUint8List(), imagePixelRatio: imagePixelRatio);
 
-          double anchorY = enableAnchorTriangle ? 1 - shadowNeededSpace / bitmapHeight : 0.5;
+          double anchorY = bubbleOptions.enableAnchorTriangle ? 1 - shadowNeededSpace / bitmapHeight : 0.5;
           return marker.copyWith(
             iconParam: bitmap,
             anchorParam: Offset(0.5, anchorY),

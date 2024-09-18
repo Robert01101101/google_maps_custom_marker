@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 //To run test: flutter test test/google_maps_custom_marker_test.dart
 
 void main() {
+  /*
   group('Test createCustomIconForMarker()', () {
     test('calls createCustomIconForMarker() with only required parameters', () async {
       Marker testMarker = await GoogleMapsCustomMarker.createCustomIconForMarker(
@@ -39,5 +40,5 @@ void main() {
       );
       expect(testMarker, isNotNull);
     });
-  });
+  });*/
 }
