@@ -79,4 +79,5 @@ _markers.addAll([pinMarker, circleMarker, bubbleMarkerCustomized]);
 
 ## Additional information
 
-This package was developed to help more easily create beautiful, semantic maps. If you have suggestions for changes, additions, or would like to contribute, that is more than welcome.
+This package was developed to help more easily create beautiful, semantic maps. 
+If you have suggestions for changes, additions, or would like to contribute, that is more than welcome.
