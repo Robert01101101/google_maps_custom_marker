@@ -1,6 +1,14 @@
 name: example
 description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+topics:
+  - map
+  - google-maps
+  - utility
+platforms:
+  android:
+  ios:
+  web:
 
 version: 1.0.0+1
 
