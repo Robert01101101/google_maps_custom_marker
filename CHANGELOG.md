@@ -1,3 +1,7 @@
+## 1.0.2
+
+* Added Future<BitmapDescriptorWithAnchor> createCustomBitmap to allow getting only bitmaps.
+
 ## 1.0.1
 
 * Ensured adherence to dart code formatting guidelines

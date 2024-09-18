@@ -1,5 +1,7 @@
 # google_maps_custom_marker
 
+[![pub package](https://img.shields.io/pub/v/google_maps_custom_marker.svg)](https://pub.dev/packages/google_maps_custom_marker)
+
 <!--
 This README describes the package. If you publish this package to pub.dev,
 this README's contents appear on the landing page for your package.

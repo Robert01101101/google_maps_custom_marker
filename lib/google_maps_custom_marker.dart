@@ -8,6 +8,7 @@ import 'dart:ui' as ui;
 
 enum MarkerShape { circle, pin, bubble }
 
+/// Configures additional options for a circle marker.
 class CircleMarkerOptions {
   final double? diameter;
 
@@ -18,6 +19,7 @@ class CircleMarkerOptions {
   CircleMarkerOptions({this.diameter});
 }
 
+/// Configures additional options for a pin marker.
 class PinMarkerOptions {
   final Color pinDotColor;
   final double? diameter;
@@ -33,6 +35,7 @@ class PinMarkerOptions {
   });
 }
 
+/// Configures additional options for a bubble marker.
 class BubbleMarkerOptions {
   final bool enableAnchorTriangle;
   final double anchorTriangleWidth;
@@ -49,6 +52,19 @@ class BubbleMarkerOptions {
     this.anchorTriangleHeight = 16,
     this.cornerRadius = 64,
   });
+}
+
+/// The returned result of createCustomBitmap. Stores the bitmap and its anchor based on the shape.
+class BitmapDescriptorWithAnchor {
+  final Offset anchorOffset;
+  final BitmapDescriptor bitmapDescriptor;
+
+  /// The returned result of createCustomBitmap. Stores the bitmap and its anchor based on the shape.
+  ///
+  /// The [anchorOffset] is the anchor point of the bitmap, that you should set on the marker.
+  /// The [bitmapDescriptor] is the bitmap image.
+  BitmapDescriptorWithAnchor(
+      {required this.anchorOffset, required this.bitmapDescriptor});
 }
 
 /// A collection of preset colors for custom markers.
@@ -112,6 +128,60 @@ class GoogleMapsCustomMarker {
   /// [circleOptions], [pinOptions] and [bubbleOptions].
   static Future<Marker> createCustomMarker({
     required Marker marker,
+    required MarkerShape shape,
+    String? title,
+    Color backgroundColor = GoogleMapsCustomMarkerColor.markerRed,
+    Color foregroundColor = Colors.white,
+    double textSize = 20,
+    bool enableShadow = true,
+    Color shadowColor = GoogleMapsCustomMarkerColor.markerShadow,
+    double shadowBlur = 8,
+    double padding = 32,
+    TextStyle? textStyle,
+    double? imagePixelRatio,
+    CircleMarkerOptions? circleOptions,
+    PinMarkerOptions? pinOptions,
+    BubbleMarkerOptions? bubbleOptions,
+  }) async {
+    BitmapDescriptorWithAnchor result = await createCustomBitmap(
+      shape: shape,
+      title: title,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      textSize: textSize,
+      enableShadow: enableShadow,
+      shadowColor: shadowColor,
+      shadowBlur: shadowBlur,
+      padding: padding,
+      textStyle: textStyle,
+      imagePixelRatio: imagePixelRatio,
+      circleOptions: circleOptions,
+      pinOptions: pinOptions,
+      bubbleOptions: bubbleOptions,
+    );
+    return marker.copyWith(
+      iconParam: result.bitmapDescriptor,
+      anchorParam: result.anchorOffset,
+    );
+  }
+
+  /// Creates a custom bitmap for use with Google Maps.
+  ///
+  /// It's recommended to use createCustomMarker() instead, as it returns the marker with the anchor already set.
+  /// Otherwise, you can use the returned result of this function to get a pair of icon and anchor.
+  /// The shape and applicable options are determined by the [shape] parameter.
+  /// The optional [title] will be displayed inside the marker.
+  /// The marker will use the [backgroundColor], and the title will use the [foregroundColor] and [textSize].
+  /// You can also provide a custom [textStyle] for further text style customization.
+  /// The [enableShadow] parameter enables a shadow behind the marker, using [shadowColor], blurred by [shadowBlur] radius.
+  /// The [padding] parameter is the padding around the text inside the marker.
+  /// For circles and pins, padding is ignored if they have a diameter specified through their options.
+  /// The [imagePixelRatio] parameter is the pixel ratio of the generated image.
+  /// It defaults to the natural resolution if not specified.
+  /// Try changing the imagePixelRatio, if you encounter unexpected scaling on certain displays.
+  /// Depending on the shape, there are additional options available for customization:
+  /// [circleOptions], [pinOptions] and [bubbleOptions].
+  static Future<BitmapDescriptorWithAnchor> createCustomBitmap({
     required MarkerShape shape,
     String? title,
     Color backgroundColor = GoogleMapsCustomMarkerColor.markerRed,
@@ -237,9 +307,9 @@ class GoogleMapsCustomMarker {
             imagePixelRatio: imagePixelRatio,
           );
 
-          return marker.copyWith(
-            iconParam: bitmap,
-            anchorParam: const Offset(0.5, 0.5), // Center of the circle
+          return BitmapDescriptorWithAnchor(
+            anchorOffset: const Offset(0.5, 0.5),
+            bitmapDescriptor: bitmap,
           );
         }
 
@@ -363,9 +433,9 @@ class GoogleMapsCustomMarker {
           );
 
           double anchorY = 1 - shadowNeededSpace / bitmapHeight;
-          return marker.copyWith(
-            iconParam: bitmap,
-            anchorParam: Offset(0.5, anchorY), // Bottom of the pin
+          return BitmapDescriptorWithAnchor(
+            anchorOffset: Offset(0.5, anchorY),
+            bitmapDescriptor: bitmap,
           );
         }
 
@@ -478,9 +548,9 @@ class GoogleMapsCustomMarker {
           double anchorY = bubbleOptions.enableAnchorTriangle
               ? 1 - extraPadding / bitmapHeight
               : 0.5;
-          return marker.copyWith(
-            iconParam: bitmap,
-            anchorParam: Offset(0.5, anchorY),
+          return BitmapDescriptorWithAnchor(
+            anchorOffset: Offset(0.5, anchorY),
+            bitmapDescriptor: bitmap,
           );
         }
     }
