@@ -1,3 +1,7 @@
+## 1.0.1
+
+* Ensured adherence to dart code formatting guidelines
+
 ## 1.0.0
 
 * Initial release
