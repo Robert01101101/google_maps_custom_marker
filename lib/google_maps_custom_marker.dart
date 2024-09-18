@@ -1,8 +1,6 @@
 library google_maps_custom_marker;
 
 import 'dart:math';
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -53,9 +51,25 @@ class BubbleMarkerOptions {
 }
 
 /// A collection of preset colors for custom markers.
-class CustomMarkerColorPreset {
-  static const Color markerRed = Color(0xffc32929);
-  static const Color markerShadow = Color(0xaa000000);
+class GoogleMapsCustomMarkerColor {
+  static const Color markerRed = Color(0xFFCF2B2B);
+  static const Color markerBlue = Color(0xFF61CFBE);
+  static const Color markerPink = Color(0xFFCF27CF);
+  static const Color markerGreen = Color(0xFF2BCF5A);
+  static const Color markerBrown = Color(0xFF7A4242);
+  static const Color markerYellow = Color(0xFFD1B634);
+  static const Color markerGrey = Color(0xFF566F7A);
+  static const Color markerShadow = Color(0x77000000);
+
+  static const List<Color> markerColors = [
+    GoogleMapsCustomMarkerColor.markerGrey,
+    GoogleMapsCustomMarkerColor.markerBlue,
+    GoogleMapsCustomMarkerColor.markerPink,
+    GoogleMapsCustomMarkerColor.markerGreen,
+    GoogleMapsCustomMarkerColor.markerBrown,
+    GoogleMapsCustomMarkerColor.markerYellow,
+    GoogleMapsCustomMarkerColor.markerRed,
+  ];
 }
 
 /// A utility class to create custom markers for Google Maps.
@@ -100,12 +114,12 @@ class GoogleMapsCustomMarker {
     required Marker marker,
     required MarkerShape shape,
     String? title,
-    Color backgroundColor = Colors.blueGrey,
+    Color backgroundColor = GoogleMapsCustomMarkerColor.markerRed,
     Color foregroundColor = Colors.white,
     double textSize = 20,
     bool enableShadow = true,
-    Color shadowColor = CustomMarkerColorPreset.markerShadow,
-    double shadowBlur = 12,
+    Color shadowColor = GoogleMapsCustomMarkerColor.markerShadow,
+    double shadowBlur = 8,
     double padding = 32,
     TextStyle? textStyle,
     double? imagePixelRatio,
@@ -132,6 +146,11 @@ class GoogleMapsCustomMarker {
     if(shape == MarkerShape.bubble && (circleOptions != null || pinOptions != null)) {
       if (kDebugMode) {
         print('GOOGLE_MAPS_CUSTOM_MARKER - WARNING: circle or pin options supplied to a bubble marker');
+      }
+    }
+    if(shape == MarkerShape.bubble && title == null) {
+      if (kDebugMode) {
+        print('GOOGLE_MAPS_CUSTOM_MARKER - WARNING: bubble marker created without a title. Consider using pin instead.');
       }
     }
 
@@ -342,8 +361,9 @@ class GoogleMapsCustomMarker {
           double bubbleHeight = textHeight + paddingVertical;
 
           // Full bitmap dimensions including shadow space and anchor
-          final double bitmapWidth = bubbleWidth + shadowNeededSpace * 2;
-          final double bitmapHeight = bubbleHeight + shadowNeededSpace * 2 + (bubbleOptions.enableAnchorTriangle ? bubbleOptions.anchorTriangleHeight : 0);
+          final double extraPadding = enableShadow ? shadowNeededSpace : 8;
+          final double bitmapWidth = bubbleWidth + extraPadding * 2;
+          final double bitmapHeight = bubbleHeight + extraPadding * 2 + (bubbleOptions.enableAnchorTriangle ? bubbleOptions.anchorTriangleHeight : 0);
 
           ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
           Canvas canvas = Canvas(pictureRecorder);
@@ -422,7 +442,7 @@ class GoogleMapsCustomMarker {
 
           BitmapDescriptor bitmap = BitmapDescriptor.bytes(byteData.buffer.asUint8List(), imagePixelRatio: imagePixelRatio);
 
-          double anchorY = bubbleOptions.enableAnchorTriangle ? 1 - shadowNeededSpace / bitmapHeight : 0.5;
+          double anchorY = bubbleOptions.enableAnchorTriangle ? 1 - extraPadding / bitmapHeight : 0.5;
           return marker.copyWith(
             iconParam: bitmap,
             anchorParam: Offset(0.5, anchorY),
