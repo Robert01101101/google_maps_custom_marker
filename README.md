@@ -94,5 +94,5 @@ If you have suggestions for changes, additions, or would like to contribute, tha
 This package is free, and there is no need to pay me. But if it helps you, I appreciate a coffee :)
 
 <a href="https://www.buymeacoffee.com/rmichels">
-    <img src="media/bmc-button.png" style="width: 150px; height: auto;" alt="Buy Me A Coffee">
+    <img src="https://github.com/Robert01101101/hide-applied-jobs-linkedin/blob/main/media/bmc-button.png" style="width: 150px; height: auto;" alt="Buy Me A Coffee">
 </a>
