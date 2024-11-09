@@ -88,3 +88,11 @@ _markers.addAll([pinMarker, circleMarker, bubbleMarkerCustomized]);
 This package was developed to help more easily create beautiful, semantic maps. 
 
 If you have suggestions for changes, additions, or would like to contribute, that is more than welcome.
+
+## Support me
+
+This package is free, and there is no need to pay me. But if it helps you, I appreciate a coffee :)
+
+<a href="https://www.buymeacoffee.com/rmichels">
+    <img src="media/bmc-button.png" style="width: 150px; height: auto;" alt="Buy Me A Coffee">
+</a>
